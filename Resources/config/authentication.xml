@@ -1,0 +1,39 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="devster.wsse.nonce.provider.class">Devster\WSSEBundle\Security\Authentication\Nonce\NonceRepositoryProvider</parameter>
+        <parameter key="devster.wsse.nonce.file.class">Devster\WSSEBundle\Security\Authentication\Nonce\FileNonceRepository</parameter>
+        <parameter key="devster.wsse.security.authentication.provider.class">Devster\WSSEBundle\Security\Provider\WsseProvider</parameter>
+        <parameter key="devster.wsse.security.authentication.listener.class">Devster\WSSEBundle\Security\Firewall\WsseListener</parameter>
+    </parameters>
+
+    <services>
+        <service id="devster.wsse.nonce.provider"
+            class="%devster.wsse.nonce.provider.class%">
+        </service>
+
+        <service id="devster.wsse.nonce.file"
+            class="%devster.wsse.nonce.file.class%">
+            <argument>%kernel.cache_dir%/security/nonces</argument>
+            <tag name="devster.wsse.nonce.repository" alias="file"/>
+        </service>
+
+        <service id="devster.wsse.security.authentication.provider"
+            class="%devster.wsse.security.authentication.provider.class%" public="false">
+            <argument /> <!-- User Provider -->
+            <argument /> <!-- Nonce Repository alias-->
+            <argument type="service" id="devster.wsse.nonce.provider"/>
+        </service>
+
+        <service id="devster.wsse.security.authentication.listener"
+            class="%devster.wsse.security.authentication.listener.class%" public="false">
+            <argument /> <!-- is in authentication chain -->
+            <argument type="service" id="security.context"/>
+            <argument type="service" id="security.authentication.manager" />
+        </service>
+    </services>
+</container>
